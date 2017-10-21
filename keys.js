@@ -8,4 +8,16 @@ var twitterKeys = {
     access_token_secret: 'pdRoXdAuESvMeZNrwuzLCd8yXTNR5eYK76tA0N9ox3Bp5'
 };
 
-module.exports = twitterKeys;
+var spotifyKeys = {
+    id: 'a894ada877ba43568f8c84096c875e59',
+    secret: '93377aae9c6b43eda98405fe38cfa2e9'
+};
+
+var omdbKey = '40e9cece';
+
+//We're exporting an object.
+module.exports = {
+    twitter: twitterKeys,
+    spotify: spotifyKeys,
+    omdb: omdbKey
+};
