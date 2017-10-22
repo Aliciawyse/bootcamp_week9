@@ -2,6 +2,8 @@ var keys = require("./keys.js");
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require("request");
+// fs is a core Node package for reading and writing files
+var fs = require("fs");
 
 
 var args = process.argv;
@@ -12,8 +14,11 @@ if(args[2] === 'my-tweets'){
     handleSpotify();
 } else if (args[2] === 'movie-this'){
     handleOmdb();
+} else if (args[2] === 'do-what-it-says'){
+    handleTxtFile();
 } else {
     //account for crap entered by users with a function "Sorry I didn't understand arg[2] then show available commands
+    handleMisc();
 }
 
 function handleTwitter(){
@@ -26,9 +31,11 @@ function handleTwitter(){
 
         if (!error && response.statusCode === 200 ) {
 
+            console.log("LIST OF TWEETS");
+
             for (var i = 0; i < tweets.length; i ++ ){
 
-                console.log(tweets[i].text);
+                console.log(tweets[i].text,'\n');
             }
         }
     });
@@ -38,16 +45,25 @@ function handleSpotify(){
 
     var spotify = new Spotify(keys.spotify);
 
-    //Concise conditional. If args[3] not provided default to The Sign
     var song = args[3] || 'The Sign';
 
-    spotify.search({ type: 'track', query: song }, function(err, data) {
-        if (err) {
-            return console.log('Error occurred: ' + err);
-        }
+    spotify
+        .search({ type: 'track', query: song })
+        .then(function(response) {
 
-        console.log(data.tracks.items[0]);
-    });
+             console.log("ARTIST(S):");
+             for (var i = 0; i < response.tracks.items[0].artists.length; i++){
+                 console.log(response.tracks.items[0].artists[i].name);
+             }
+             console.log("SONG NAME:\n",response.tracks.items[0].name);
+
+            console.log("PREVIEW LINK:\n",response.tracks.items[0].album.external_urls.spotify);
+            console.log("ALBUM:\n",response.tracks.items[0].album.name);
+
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
 }
 
 function handleOmdb (){
@@ -83,18 +99,21 @@ function handleOmdb (){
             //console.log("res",res);
         }
     });
-};
+}
 
+function handleTxtFile (){
+    fs.readFile("random.txt", "utf8", function(error, data){
 
-//
-// if(operator === 'spotify-this-song'){
-//     console.log("A song");
-// }
-//
-// if(operator === 'movie-this'){
-//     console.log("Movies");
-// }
-//
-// if(operator === 'do-what-it-says'){
-//     console.log("To-do");
-// }
+        if(error) {
+            return console.log(error);
+        }
+        //log contents of data
+        console.log(data);
+
+    })
+}
+
+function handleMisc (){
+    console.log("Sorry I didn't understand your input. The available commands are: my-tweet, spotify-this-song, movie-this and do-what-it-says");
+}
+
